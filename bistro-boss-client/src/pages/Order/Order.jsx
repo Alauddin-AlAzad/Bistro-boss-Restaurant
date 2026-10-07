@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import orderCoverImg from '../../assets/order/banner2.jpg';
 import Cover from '../Shared/Cover';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
@@ -9,13 +9,21 @@ import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router';
 
 const Order = () => {
-    const categories = ['salad', 'pizza', 'soup', 'desert', 'drinks']
-    const { category } = useParams()
-    const initialIndex = categories.indexOf(category)
-    const [tabIndex, setTabIndex] = useState(initialIndex);
+    const categories = ['salad', 'pizza', 'soup', 'dessert', 'drinks'];
+    const { category } = useParams();
+
+    // Category onujayi thik index ber kora
+    const initialIndex = categories.indexOf(category?.toLowerCase());
+    const [tabIndex, setTabIndex] = useState(initialIndex !== -1 ? initialIndex : 0);
+
     const [menu] = useMenu();
 
-
+  
+    useEffect(() => {
+        const currentIdx = categories.indexOf(category?.toLowerCase());
+        setTabIndex(currentIdx !== -1 ? currentIdx : 0);
+        window.scrollTo(0, 0);
+    }, [category]);
 
     const salad = menu.filter(item => item.category === 'salad');
     const pizza = menu.filter(item => item.category === 'pizza');
@@ -37,43 +45,44 @@ const Order = () => {
                 />
             </div>
 
+           
+            <div className="min-h-[60vh]">
+                <Tabs selectedIndex={tabIndex} onSelect={(index) => setTabIndex(index)}>
+                    <div className="flex justify-center my-8">
+                        <TabList className="flex flex-wrap justify-center gap-4 md:gap-8 border-none">
+                            {categories.map((tabItem) => (
+                                <Tab
+                                    key={tabItem}
+                                    className="cursor-pointer font-bold uppercase text-xs md:text-base tracking-wider text-gray-500 pb-2 border-b-4 border-transparent outline-none transition-all duration-200"
+                                    selectedClassName="!text-[#BB8506] !border-[#BB8506]"
+                                >
+                                    {tabItem}
+                                </Tab>
+                            ))}
+                        </TabList>
+                    </div>
 
-            <Tabs defaultIndex={tabIndex} onSelect={(index) => setTabIndex(index)}>
-                <div className="flex justify-center my-8">
-                    <TabList className="flex flex-wrap justify-center gap-4 md:gap-8 border-none">
-                        {categories.map((tabItem) => (
-                            <Tab
-                                key={tabItem}
-                                className="cursor-pointer font-bold uppercase text-xs md:text-base tracking-wider text-gray-500 pb-2 border-b-4 border-transparent outline-none transition-all duration-200"
-                                selectedClassName="!text-[#BB8506] !border-[#BB8506]"
-                            >
-                                {tabItem}
-                            </Tab>
-                        ))}
-                    </TabList>
-                </div>
+                    <TabPanel>
+                        <FoodCard items={salad} />
+                    </TabPanel>
 
+                    <TabPanel>
+                        <FoodCard items={pizza} />
+                    </TabPanel>
 
-                <TabPanel>
-                    <FoodCard items={salad} />
-                </TabPanel>
+                    <TabPanel>
+                        <FoodCard items={soup} />
+                    </TabPanel>
 
-                <TabPanel>
-                    <FoodCard items={pizza} />
-                </TabPanel>
+                    <TabPanel>
+                        <FoodCard items={dessert} />
+                    </TabPanel>
 
-                <TabPanel>
-                    <FoodCard items={soup} />
-                </TabPanel>
-
-                <TabPanel>
-                    <FoodCard items={dessert} />
-                </TabPanel>
-
-                <TabPanel>
-                    <FoodCard items={drinks} />
-                </TabPanel>
-            </Tabs>
+                    <TabPanel>
+                        <FoodCard items={drinks} />
+                    </TabPanel>
+                </Tabs>
+            </div>
         </div>
     );
 };
